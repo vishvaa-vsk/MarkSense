@@ -1,7 +1,40 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import MarkdownPreview from "@uiw/react-markdown-preview";
+import "@uiw/react-markdown-preview/markdown.css";
 import { useAuth } from "../context/AuthContext";
 import { noteService } from "../services/noteService";
+
+// Custom styles for dashboard markdown preview
+const dashboardMarkdownStyles = `
+  .dashboard-markdown h1, .dashboard-markdown h2, .dashboard-markdown h3 {
+    margin: 0.25rem 0;
+    font-size: 1em;
+    font-weight: 600;
+  }
+  .dashboard-markdown p {
+    margin: 0.25rem 0;
+  }
+  .dashboard-markdown ul, .dashboard-markdown ol {
+    margin: 0.25rem 0;
+    padding-left: 1.5rem;
+  }
+  .dashboard-markdown li {
+    margin: 0.125rem 0;
+  }
+  .dashboard-markdown code {
+    background-color: #f3f4f6;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.8em;
+  }
+  .dashboard-markdown blockquote {
+    border-left: 2px solid #e5e7eb;
+    margin: 0.25rem 0;
+    padding-left: 0.75rem;
+    color: #6b7280;
+  }
+`;
 
 const Dashboard = () => {
   const [notes, setNotes] = useState([]);
@@ -48,6 +81,9 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Inject custom CSS */}
+      <style>{dashboardMarkdownStyles}</style>
+
       {/* Header */}
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -129,9 +165,23 @@ const Dashboard = () => {
                         </button>
                       </div>
                     </div>
-                    <p className="mt-2 text-sm text-gray-600 line-clamp-3">
-                      {note.content.substring(0, 150)}...
-                    </p>
+                    <div className="relative">
+                      {/* Markdown Preview */}
+                      <div className="mt-2 text-sm text-gray-600 h-24 overflow-hidden dashboard-markdown">
+                        <MarkdownPreview
+                          source={note.content}
+                          style={{
+                            backgroundColor: "transparent",
+                            padding: 0,
+                            fontSize: "0.875rem",
+                            lineHeight: "1.4",
+                          }}
+                          className="prose prose-sm max-w-none"
+                        />
+                      </div>
+                      {/* Fade overlay for long content */}
+                      <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
+                    </div>
                     <div className="mt-4 text-xs text-gray-500">
                       Last updated:{" "}
                       {new Date(note.updatedAt).toLocaleDateString()}
