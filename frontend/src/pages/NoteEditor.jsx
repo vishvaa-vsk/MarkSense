@@ -20,7 +20,7 @@ const NoteEditor = () => {
     if (isEditing) {
       fetchNote();
     }
-  }, [id]);
+  }, [id, isEditing]);
 
   const fetchNote = async () => {
     try {
@@ -66,96 +66,90 @@ const NoteEditor = () => {
     }
   };
 
+  // Debug rendering
+  console.log("About to render NoteEditor");
+
+  // Simple test render first
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-4">
-              <Link
-                to="/dashboard"
-                className="text-gray-500 hover:text-gray-700"
-              >
-                ← Back to Dashboard
-              </Link>
-              <h1 className="text-2xl font-bold text-gray-900">
-                {isEditing ? "Edit Note" : "Create New Note"}
-              </h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button
-                type="button"
-                onClick={() => setPreview(!preview)}
-                className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm font-medium"
-              >
-                {preview ? "Edit" : "Preview"}
-              </button>
-              <button
-                onClick={handleSubmit}
-                disabled={loading}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50"
-              >
-                {loading ? "Saving..." : "Save Note"}
-              </button>
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">
+          {isEditing ? "Edit Note" : "Create New Note"}
+        </h1>
+
+        <Link
+          to="/dashboard"
+          className="inline-block mb-6 text-blue-600 hover:text-blue-800"
+        >
+          ← Back to Dashboard
+        </Link>
+
+        {error && (
+          <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Title
+            </label>
+            <input
+              type="text"
+              name="title"
+              placeholder="Enter note title..."
+              value={formData.title}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Content (Markdown)
+            </label>
+            <textarea
+              name="content"
+              placeholder="Write your note in Markdown..."
+              value={formData.content}
+              onChange={handleChange}
+              required
+              rows={15}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+            />
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md disabled:opacity-50"
+            >
+              {loading ? "Saving..." : "Save Note"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setPreview(!preview)}
+              className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md"
+            >
+              {preview ? "Edit" : "Preview"}
+            </button>
+          </div>
+        </form>
+
+        {preview && (
+          <div className="mt-8">
+            <h3 className="text-lg font-medium text-gray-700 mb-4">Preview</h3>
+            <div className="border border-gray-300 rounded-md p-4 bg-white">
+              <ReactMarkdown className="prose">
+                {formData.content || "*Preview will appear here...*"}
+              </ReactMarkdown>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          {error && (
-            <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <input
-                type="text"
-                name="title"
-                placeholder="Note title..."
-                value={formData.title}
-                onChange={handleChange}
-                required
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-lg font-medium"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Editor */}
-              <div className={`${preview ? "hidden lg:block" : ""}`}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Markdown Content
-                </label>
-                <textarea
-                  name="content"
-                  placeholder="Write your note in Markdown..."
-                  value={formData.content}
-                  onChange={handleChange}
-                  required
-                  rows={20}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
-                />
-              </div>
-
-              {/* Preview */}
-              <div className={`${!preview ? "hidden lg:block" : ""}`}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Preview
-                </label>
-                <div className="h-96 lg:h-auto border border-gray-300 rounded-md p-4 bg-white overflow-auto">
-                  <ReactMarkdown className="prose prose-sm max-w-none">
-                    {formData.content || "*Preview will appear here...*"}
-                  </ReactMarkdown>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
+        )}
       </div>
     </div>
   );
