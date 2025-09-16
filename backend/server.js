@@ -24,6 +24,7 @@ mongoose
 // Routes
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/notes", require("./routes/notes"));
+app.use("/api/ai", require("./routes/ai"));
 
 // Health check endpoint
 app.get("/", (req, res) => {

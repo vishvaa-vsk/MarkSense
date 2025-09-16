@@ -18,6 +18,16 @@ const noteSchema = new mongoose.Schema(
       required: [true, "Content is required"],
       maxlength: [10000, "Content cannot exceed 10000 characters"],
     },
+    tags: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: function (tags) {
+          return tags.length <= 10; // Limit to 10 tags
+        },
+        message: "Cannot have more than 10 tags",
+      },
+    },
   },
   {
     timestamps: true,

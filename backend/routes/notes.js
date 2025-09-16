@@ -65,7 +65,7 @@ router.get("/:id", async (req, res) => {
 // @access  Private
 router.post("/", async (req, res) => {
   try {
-    const { title, content } = req.body;
+    const { title, content, tags } = req.body;
 
     if (!title || !content) {
       return res.status(400).json({
@@ -78,6 +78,7 @@ router.post("/", async (req, res) => {
       userId: req.user._id,
       title,
       content,
+      tags: tags || [],
     });
 
     await note.save();
@@ -101,7 +102,7 @@ router.post("/", async (req, res) => {
 // @access  Private
 router.put("/:id", async (req, res) => {
   try {
-    const { title, content } = req.body;
+    const { title, content, tags } = req.body;
 
     const note = await Note.findOne({
       _id: req.params.id,
@@ -117,6 +118,9 @@ router.put("/:id", async (req, res) => {
 
     note.title = title || note.title;
     note.content = content || note.content;
+    if (tags !== undefined) {
+      note.tags = tags;
+    }
 
     await note.save();
 
